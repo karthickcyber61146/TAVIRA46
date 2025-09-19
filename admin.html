@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Panel - TAVIRA E-Shop</title>
+
+  <style>
+    body{background:#0f172a;color:#e6eef8;font-family:Arial, sans-serif;margin:0;padding:20px}
+    h1{margin-bottom:20px}
+    .box{background:#071428;padding:20px;border-radius:12px;margin-bottom:20px}
+    input,textarea{width:100%;padding:10px;margin-bottom:12px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff}
+    button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer;font-weight:bold}
+    .btn-primary{background:linear-gradient(90deg,#06b6d4,#7c3aed);color:white}
+    .btn-secondary{background:#334155;color:white}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.2);text-align:left}
+    .small-btn{padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:white;cursor:pointer}
+    .muted{color:#94a3b8;font-size:14px}
+  </style>
+</head>
+<body>
+  <h1>Admin Panel - TAVIRA E-Shop</h1>
+
+  <!-- Admin Login -->
+  <div id="adminLogin" class="box">
+    <h2>Admin Login</h2>
+    <p class="muted">Enter admin password:</p>
+    <input type="password" id="adminPass" placeholder="Password">
+    <button class="btn-primary" id="loginBtn">Login</button>
+    <div id="loginMsg" class="muted"></div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="box" style="display:none">
+    <h2>Manage Products</h2>
+
+    <input type="text" id="pTitle" placeholder="Product Title">
+    <input type="number" id="pPrice" placeholder="Product Price">
+    <textarea id="pDesc" placeholder="Product Description"></textarea>
+    <input type="text" id="pImg" placeholder="Image path (e.g. images/IMG1.png)">
+
+    <button class="btn-primary" id="addBtn">Add Product</button>
+    <button class="btn-secondary" id="clearBtn">Clear</button>
+    <div id="formMsg" class="muted"></div>
+
+    <h3 style="margin-top:20px">Product List</h3>
+    <table>
+      <thead>
+        <tr><th>Title</th><th>Price</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="productTable"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const ADMIN_PASSWORD = "61146"; // admin password
+
+    const K_PRODUCTS = "q_products";
+    const getProducts = () => JSON.parse(localStorage.getItem(K_PRODUCTS)||"[]");
+    const saveProducts = (arr) => localStorage.setItem(K_PRODUCTS, JSON.stringify(arr));
+
+    let editingId = null;
+
+    const $ = id => document.getElementById(id);
+
+    // Login check
+    $("loginBtn").onclick = () => {
+      const pw = $("adminPass").value.trim();
+      if(pw === ADMIN_PASSWORD){
+        $("adminLogin").style.display = "none";
+        $("adminPanel").style.display = "block";
+        loadProducts();
+      } else {
+        $("loginMsg").innerText = "Wrong password!";
+      }
+    };
+
+    // Add or update product
+    $("addBtn").onclick = () => {
+      const title = $("pTitle").value.trim();
+      const price = parseFloat($("pPrice").value);
+      const desc = $("pDesc").value.trim();
+      const img = $("pImg").value.trim() || "images/placeholder.png";
+
+      if(!title || !price || !desc){
+        $("formMsg").innerText = "Please fill all fields";
+        return;
+      }
+
+      const products = getProducts();
+
+      if(editingId){
+        const idx = products.findIndex(p=>p.id===editingId);
+        if(idx>=0){
+          products[idx].title=title;
+          products[idx].price=price;
+          products[idx].desc=desc;
+          products[idx].img=img;
+          $("formMsg").innerText = "Product updated";
+        }
+        editingId=null;
+        $("addBtn").innerText="Add Product";
+      } else {
+        products.push({id:Date.now(), title, price, desc, img});
+        $("formMsg").innerText = "Product added";
+      }
+
+      saveProducts(products);
+      clearForm();
+      loadProducts();
+    };
+
+    $("clearBtn").onclick = () => { clearForm(); };
+
+    function clearForm(){
+      $("pTitle").value=""; $("pPrice").value=""; $("pDesc").value=""; $("pImg").value="";
+      editingId=null; $("addBtn").innerText="Add Product"; $("formMsg").innerText="";
+    }
+
+    function loadProducts(){
+      const tbody = $("productTable"); tbody.innerHTML="";
+      const products = getProducts();
+      products.forEach(p=>{
+        const tr=document.createElement("tr");
+        tr.innerHTML=`
+          <td>${p.title}</td>
+          <td>₹${p.price}</td>
+          <td>
+            <button class="small-btn" onclick="editProduct(${p.id})">Edit</button>
+            <button class="small-btn" onclick="deleteProduct(${p.id})">Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.editProduct = (id) => {
+      const p = getProducts().find(x=>x.id===id);
+      if(!p) return;
+      $("pTitle").value=p.title;
+      $("pPrice").value=p.price;
+      $("pDesc").value=p.desc;
+      $("pImg").value=p.img;
+      editingId=id;
+      $("addBtn").innerText="Update Product";
+      $("formMsg").innerText="Editing product";
+    };
+
+    window.deleteProduct = (id) => {
+      if(!confirm("Delete this product?")) return;
+      let products=getProducts().filter(p=>p.id!==id);
+      saveProducts(products);
+      loadProducts();
+    };
+  </script>
+</body>
+</html>
+

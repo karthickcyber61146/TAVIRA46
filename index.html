@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TAVIRA E-SHOP</title>
+ <link rel="icon" href="/home/kv/Documents/tavira web/img/logo.webp" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter, system-ui, Arial, sans-serif}
+body{background:linear-gradient(135deg,#0f172a 0%, #061826 45%, #0b1020 100%);color:#e6eef8;min-height:100vh;transition:0.3s}
+body.light{background:#f5f5f5;color:#111}
+.wrap{max-width:1100px;margin:28px auto;padding:20px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#ff6fd8,#6a5cff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#071428}
+nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nav-btn{background:transparent;border:1px solid rgba(255,255,255,.2);padding:8px 12px;border-radius:10px;cursor:pointer;color:#fff;transition:0.3s}
+body.light .nav-btn{color:#111;border-color:rgba(0,0,0,.2)}
+.neon-btn{padding:8px 12px;border-radius:12px;font-weight:700;border:none;cursor:pointer;transition:0.3s}
+.neon-primary{background:linear-gradient(90deg,#06b6d4,#7c3aed);color:white}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:rgba(255,255,255,.05);padding:14px;border-radius:12px;transition:transform 0.3s,box-shadow 0.3s;position:relative}
+body.light .card{background:#fff;color:#111;border:1px solid #ddd}
+.card:hover{transform:translateY(-5px) scale(1.02);box-shadow:0 8px 20px rgba(0,0,0,0.3)}
+.product-img img{height:180px;width:100%;object-fit:cover;border-radius:10px}
+.p-title{font-weight:700;margin:10px 0}
+.p-desc{font-size:13px;color:#cfe9ff9e;height:40px;overflow:hidden}
+body.light .p-desc{color:#555}
+.p-meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.cart-badge{background:#ef4444;color:white;border-radius:999px;padding:4px 8px;font-weight:700;margin-left:6px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.6);display:none;align-items:center;justify-content:center;z-index:40}
+body.light .modal-backdrop{background:rgba(200,200,200,.6)}
+.modal{width:92%;max-width:500px;background:#071428;padding:18px;border-radius:12px}
+body.light .modal{background:#fff;color:#111}
+input, textarea, select{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;width:100%}
+body.light input,body.light textarea,body.light select{background:#f5f5f5;color:#111;border:1px solid #ccc}
+textarea{resize:none}
+.cart-list{margin-top:12px}
+.cart-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);margin-bottom:10px}
+body.light .cart-item{border:1px solid #ccc}
+.qty{display:flex;gap:6px;align-items:center}
+.pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2)}
+.contact-form{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.wishlist{position:absolute;top:10px;right:10px;font-size:20px;cursor:pointer}
+.rating{display:flex;gap:2px}
+.rating span{cursor:pointer;font-size:18px;color:#ffd700}
+.rating span.gray{color:#ccc}
+
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr} header{flex-direction:column;align-items:flex-start;gap:10px}}
+
+/* --- Neon Buttons --- */
+.neon-btn{position:relative;display:inline-block;padding:10px 18px;border-radius:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:#fff;background:linear-gradient(45deg,#06b6d4,#7c3aed);border:none;cursor:pointer;overflow:hidden;transition:all 0.4s ease;}
+.neon-btn::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(60deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05), rgba(255,255,255,0.2));transform:rotate(45deg);transition:all 0.5s;opacity:0;}
+.neon-btn:hover{transform:scale(1.1);box-shadow:0 0 10px #06b6d4,0 0 20px #7c3aed,0 0 30px #06b6d4,0 0 40px #7c3aed;}
+.neon-btn:hover::before{opacity:1;transform:rotate(45deg) scale(1.2);}
+
+/* Variants */
+.neon-primary{background:linear-gradient(90deg,#06b6d4,#7c3aed);}
+.neon-primary:hover{background:linear-gradient(90deg,#7c3aed,#06b6d4);filter:brightness(1.2);}
+.neon-secondary{background:linear-gradient(45deg,#f97316,#f43f5e);}
+.neon-secondary:hover{background:linear-gradient(45deg,#f43f5e,#f97316);box-shadow:0 0 12px #f97316,0 0 20px #f43f5e;}
+.neon-auth{background:linear-gradient(135deg,#22d3ee,#818cf8);}
+.neon-auth:hover{transform:scale(1.1) rotate(-1deg);box-shadow:0 0 15px #22d3ee,0 0 25px #818cf8;}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:rgba(255,255,255,.05);padding:14px;border-radius:12px;transition: transform 0.3s ease, box-shadow 0.3s ease}
+.card:hover{transform:translateY(-6px) scale(1.03);box-shadow:0 8px 20px rgba(0,0,0,0.4)}
+.product-img img{height:180px;width:100%;object-fit:cover;border-radius:10px}
+.p-title{font-weight:700;margin:10px 0}
+.p-desc{font-size:13px;color:#cfe9ff9e;height:40px;overflow:hidden}
+.p-meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+
+.cart-badge{background:#ef4444;color:white;border-radius:999px;padding:4px 8px;font-weight:700;margin-left:6px}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.6);display:none;align-items:center;justify-content:center;z-index:40}
+.modal{width:92%;max-width:500px;background:#071428;padding:18px;border-radius:12px}
+.modal h2{margin-bottom:10px}
+input, textarea{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;width:100%}
+textarea{resize:none}
+
+.cart-list{margin-top:12px}
+.cart-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);margin-bottom:10px}
+.qty{display:flex;gap:6px;align-items:center}
+.pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2)}
+
+.contact-form{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr} header{flex-direction:column;align-items:flex-start;gap:10px}}
+/* --- Neon Buttons for main navigation --- */
+.nav-btn {
+  position: relative;
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: linear-gradient(45deg,#06b6d4,#7c3aed);
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05), rgba(255,255,255,0.2));
+  transform: rotate(45deg);
+  transition: all 0.5s;
+  opacity: 0;
+}
+
+.nav-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #06b6d4, 0 0 20px #7c3aed, 0 0 30px #06b6d4, 0 0 40px #7c3aed;
+}
+
+.nav-btn:hover::before {
+  opacity: 1;
+  transform: rotate(45deg) scale(1.2);
+}
+
+/* --- Optional color variants --- */
+.nav-btn.primary {
+  background: linear-gradient(90deg,#06b6d4,#7c3aed);
+}
+
+.nav-btn.secondary {
+  background: linear-gradient(45deg,#f97316,#f43f5e);
+}
+
+.nav-btn.auth {
+  background: linear-gradient(135deg,#22d3ee,#818cf8);
+}
+
+.nav-btn.primary:hover {
+  background: linear-gradient(90deg,#7c3aed,#06b6d4);
+  filter: brightness(1.2);
+}
+
+.nav-btn.secondary:hover {
+  background: linear-gradient(45deg,#f43f5e,#f97316);
+  box-shadow: 0 0 12px #f97316, 0 0 20px #f43f5e;
+}
+
+.nav-btn.auth:hover {
+  transform: scale(1.1) rotate(-1deg);
+  box-shadow: 0 0 15px #22d3ee, 0 0 25px #818cf8;
+}
+/* --- Reset & Base --- */
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter, system-ui, Arial, sans-serif}
+body{
+  background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #ff00cc);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #e6eef8;
+  min-height:100vh;
+  transition: color 0.3s ease;
+}
+@keyframes gradientBG {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
+.wrap{max-width:1100px;margin:28px auto;padding:20px}
+
+/* --- Header & Navigation --- */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#ff6fd8,#6a5cff);display:flex;align-items:center;justify-content:center;font-weight:800;color:#071428}
+nav{display:flex;gap:8px;align-items:center}
+
+/* --- Neon Buttons --- */
+.nav-btn {
+  position: relative;
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: linear-gradient(45deg,#06b6d4,#7c3aed);
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05), rgba(255,255,255,0.2));
+  transform: rotate(45deg);
+  transition: all 0.5s;
+  opacity: 0;
+}
+
+.nav-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #06b6d4, 0 0 20px #7c3aed, 0 0 30px #06b6d4, 0 0 40px #7c3aed;
+}
+
+.nav-btn:hover::before {
+  opacity: 1;
+  transform: rotate(45deg) scale(1.2);
+}
+
+/* --- Optional variants --- */
+.nav-btn.primary { background: linear-gradient(90deg,#06b6d4,#7c3aed);}
+.nav-btn.secondary { background: linear-gradient(45deg,#f97316,#f43f5e);}
+.nav-btn.auth { background: linear-gradient(135deg,#22d3ee,#818cf8);}
+
+.nav-btn.primary:hover { background: linear-gradient(90deg,#7c3aed,#06b6d4);}
+.nav-btn.secondary:hover { background: linear-gradient(45deg,#f43f5e,#f97316);}
+.nav-btn.auth:hover { transform: scale(1.1) rotate(-1deg); }
+
+/* --- Grid & Cards --- */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{
+  background: rgba(255,255,255,.05);
+  padding:14px;
+  border-radius:12px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover{
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #06b6d4, 0 0 25px #7c3aed;
+}
+
+.product-img img{height:180px;width:100%;object-fit:cover;border-radius:10px}
+.p-title{font-weight:700;margin:10px 0}
+.p-desc{font-size:13px;color:#cfe9ff9e;height:40px;overflow:hidden}
+.p-meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+
+/* --- Cart --- */
+.cart-badge{background:#ef4444;color:white;border-radius:999px;padding:4px 8px;font-weight:700;margin-left:6px}
+.cart-list{margin-top:12px}
+.cart-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);margin-bottom:10px}
+.qty{display:flex;gap:6px;align-items:center}
+.pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2)}
+
+/* --- Contact Form --- */
+.contact-form{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+input, textarea{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#fff;width:100%}
+textarea{resize:none}
+
+/* --- Modal --- */
+.modal-backdrop{position:fixed;inset:0;background:rgba(2,6,23,.6);display:none;align-items:center;justify-content:center;z-index:40}
+.modal{width:92%;max-width:500px;background:#071428;padding:18px;border-radius:12px}
+.modal h2{margin-bottom:10px}
+
+/* --- Responsive --- */
+@media (max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.grid{grid-template-columns:1fr} header{flex-direction:column;align-items:flex-start;gap:10px}}
+
+.brand h1 {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow:
+     0 0 5px #06b6d4,
+     0 0 10px #06b6d4,
+     0 0 20px #7c3aed,
+     0 0 30px #7c3aed,
+     0 0 40px #06b6d4,
+     0 0 55px #7c3aed,
+     0 0 75px #06b6d4;
+  transition: all 0.3s ease-in-out;
+}
+
+.brand h1:hover {
+  text-shadow:
+     0 0 10px #06b6d4,
+     0 0 20px #06b6d4,
+     0 0 30px #7c3aed,
+     0 0 40px #7c3aed,
+     0 0 50px #06b6d4,
+     0 0 65px #7c3aed,
+     0 0 90px #06b6d4;
+  transform: scale(1.05);
+}
+.logo img {
+  border-radius: 50%;
+  padding: 4px;
+  background: #111;
+  box-shadow:
+    0 0 8px #06b6d4,
+    0 0 16px #06b6d4,
+    0 0 24px #7c3aed,
+    0 0 32px #7c3aed;
+  transition: all 0.3s ease-in-out;
+}
+
+.logo img:hover {
+  box-shadow:
+    0 0 12px #06b6d4,
+    0 0 20px #06b6d4,
+    0 0 28px #7c3aed,
+    0 0 36px #7c3aed,
+    0 0 50px #06b6d4;
+  transform: scale(1.05);
+}
+
+/* Brand Name Neon */
+.brand h1 {
+  font-size: 65px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+  animation: flicker 2s infinite alternate;
+  text-shadow: 
+    0 0 5px #ff00ff,
+    0 0 10px #ff00ff,
+    0 0 20px #ff00ff,
+    0 0 40px #ff00ff,
+    0 0 80px #ff00ff;
+}
+
+/* Flicker animation */
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    opacity: 0.3;
+    text-shadow: none;
+  }
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">
+        <img src="/home/kv/Documents/tavira web/img/logo.webp" alt="Logo" style="width:56px;height:56px;border-radius:12px;">
+      </div>
+      <div><h1>TAVIRA E-SHOP</h1></div>
+      
+    </div>
+    <a href="https://www.instagram.com/_tavira_46?igsh=YXJ4ZHFjcnJpN3Zr" target="_blank">
+  <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" 
+       alt="Instagram" width="40" height="40">
+</a>
+
+    <nav>
+    
+      <input type="text" id="productSearch" placeholder="Search products..." style="padding:6px 10px;border-radius:10px;border:1px solid #ccc;width:180px">
+      <select id="sortSelect" style="padding:6px 10px;border-radius:10px;">
+        <option value="">Sort By</option>
+        <option value="priceLow">Price Low → High</option>
+        <option value="priceHigh">Price High → Low</option>
+        <option value="rating">Rating High → Low</option>
+      </select>
+      <button class="nav-btn" id="homeBtn">Home</button>
+      <button class="nav-btn" id="cartBtn">Cart <span id="cartCount" class="cart-badge">0</span></button>
+      <button class="nav-btn" id="contactBtn">Contact</button>
+      <button class="nav-btn" id="loginBtn">Login / Register</button>
+      <button class="nav-btn" id="themeToggle">Toggle Dark/Light</button>
+      <button class="nav-btn" onclick="openAdmin()">Admin</button>
+      
+    </nav>
+    
+  </header>
+
+  <main>
+    <!-- Home Section -->
+    <section id="homeSection">
+      <h2 style="font-size:20px;margin-bottom:12px">Featured Products</h2>
+      <div id="productsGrid" class="grid"></div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cartSection" style="display:none">
+      <h2>Your Cart</h2>
+      <div class="cart-list" id="cartList"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <div id="cartSummary">0 items</div>
+        <div><button class="neon-btn neon-primary" id="checkoutBtn">Checkout</button></div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contactSection" style="display:none">
+      <h2>Contact Us</h2>
+      <div class="contact-form">
+        <input type="text" id="contactName" placeholder="Full Name">
+        <input type="email" id="contactEmail" placeholder="Email">
+        <textarea id="contactMsg" rows="5" placeholder="Your Message"></textarea>
+        <button class="neon-btn neon-primary" onclick="sendMessage()">Send Message</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Product Modal -->
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <button id="closeModal" style="float:right">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
+  <div id="authBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <button id="closeAuth" style="float:right">✕</button>
+      <h2 id="authTitle">Login</h2>
+      <div id="loginForm">
+        <input id="loginEmail" type="email" placeholder="Email" /><br><br>
+        <input id="loginPass" type="password" placeholder="Password" /><br><br>
+        <button class="neon-btn neon-primary" id="doLogin">Login</button>
+        <button class="nav-btn" id="showRegister">Register</button>
+      </div>
+      <div id="regForm" style="display:none">
+        <input id="regName" type="text" placeholder="Full Name" /><br><br>
+        <input id="regEmail" type="email" placeholder="Email" /><br><br>
+        <input id="regPass" type="password" placeholder="Password" /><br><br>
+        <button class="neon-btn neon-primary" id="doRegister">Register</button>
+        <button class="nav-btn" id="showLogin">Back</button>
+      </div>
+      <div id="authMsg" style="margin-top:10px;color:#9fb6d0"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- Products ---
+const sampleProducts = [
+  {id:1,title:'Peri-Peri Masala',price:99,desc:'Spicy peri-peri marinated chicken with fries and soft drink',img:'/home/kv/Documents/tavira web/img/IMG1.png',rating:4},
+  {id:2,title:'Garlic Masala',price:99,desc:'Infused with roasted garlic for a deep, aromatic punch in every bite',img:'/home/kv/Documents/tavira web/img/Garlic Masala.png',rating:5},
+  {id:3,title:'Lemon Pepper Masala',price:99,desc:'A zesty mix of lemon and pepper that adds tangy freshness to your meals.',img:'/home/kv/Documents/tavira web/img/lemon.png',rating:3},
+  {id:4,title:'Turmeric Masala',price:99,desc:'Golden goodness packed with earthy flavor and natural health benefits',img:'/home/kv/Documents/tavira web/img/Turmeric Masala.png',rating:4},
+  {id:5,title:'Coriander Masala',price:99,desc:'Freshly ground coriander seeds for a mild, fragrant, and refreshing taste',img:'/home/kv/Documents/tavira web/img/Coriander Masala .png',rating:5},
+  {id:6,title:'Garam Masala',price:99,desc:'A rich blend of traditional spices for bold and authentic Indian flavors.',img:'/home/kv/Documents/tavira web/img/Garam Masala .png',rating:4}
+];
+
+// --- Helpers ---
+const $ = id => document.getElementById(id);
+const getCart = () => JSON.parse(localStorage.getItem('q_cart')||'{}');
+const saveCart = (c) => localStorage.setItem('q_cart', JSON.stringify(c));
+const getUsers = () => JSON.parse(localStorage.getItem('q_users')||'[]');
+const saveUsers = (u) => localStorage.setItem('q_users', JSON.stringify(u));
+const getWishlist = () => JSON.parse(localStorage.getItem('q_wishlist')||'[]');
+const saveWishlist = (w) => localStorage.setItem('q_wishlist', JSON.stringify(w));
+
+// --- Render Products ---
+function renderProducts(){
+  const filterValue = $('productSearch').value.toLowerCase();
+  const sortVal = $('sortSelect').value;
+  let products = [...sampleProducts].filter(p=>p.title.toLowerCase().includes(filterValue));
+
+  // Sorting
+  if(sortVal==='priceLow') products.sort((a,b)=>a.price-b.price);
+  if(sortVal==='priceHigh') products.sort((a,b)=>b.price-a.price);
+  if(sortVal==='rating') products.sort((a,b)=>(b.rating||0)-(a.rating||0));
+
+  const grid = $('productsGrid'); grid.innerHTML='';
+  const wishlist = getWishlist();
+  products.forEach(p=>{
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`
+      <div class="wishlist" onclick="toggleWishlist(${p.id})">${wishlist.includes(p.id)?'❤️':'🤍'}</div>
+      <div class="product-img"><img src="${p.img}" alt="${p.title}"></div>
+      <div class="p-title">${p.title}</div>
+      <div class="p-desc">${p.desc}</div>
+      <div class="rating">${renderRating(p)}</div>
+      <div class="p-meta">
+        <div><strong>₹${p.price}</strong></div>
+        <div style="display:flex;gap:8px">
+          <button class="neon-btn" onclick="quickView(${p.id})">View</button>
+          <button class="neon-btn neon-primary" onclick="addToCart(${p.id})">Add</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  updateCartCount();
+}
+function renderRating(p){
+  let stars='';
+  for(let i=1;i<=5;i++){
+    stars+=`<span class="${i<=p.rating?'':'gray'}" onclick="rateProduct(${p.id},${i})">&#9733;</span>`;
+  }
+  return stars;
+}
+
+// --- Wishlist ---
+function toggleWishlist(id){
+  let wishlist = getWishlist();
+  if(wishlist.includes(id)) wishlist = wishlist.filter(x=>x!==id);
+  else wishlist.push(id);
+  saveWishlist(wishlist);
+  renderProducts();
+}
+
+// --- Rate Product ---
+function rateProduct(id,val){
+  const p = sampleProducts.find(x=>x.id===id);
+  if(p){ p.rating=val; renderProducts(); }
+}
+
+// --- Quick View ---
+function quickView(id){
+  const p = sampleProducts.find(x=>x.id===id);
+  $('modalBody').innerHTML=`
+    <h2>${p.title} — ₹${p.price}</h2>
+    <div><img src="${p.img}" style="max-width:100%;border-radius:8px"></div>
+    <p>${p.desc}</p>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="q_qty" type="number" value="1" min="1" style="width:80px">
+      <button class="neon-btn neon-primary" onclick="addToCart(${p.id}, parseInt(document.getElementById('q_qty').value)||1)">Add</button>
+    </div>`;
+  $('modalBackdrop').style.display='flex';
+}
+$('closeModal').onclick=()=>$('modalBackdrop').style.display='none';
+
+// --- Cart Functions ---
+function addToCart(id,qty=1){ const cart=getCart(); if(!cart[id]) cart[id]=0; cart[id]+=qty; saveCart(cart); updateCartCount(); $('modalBackdrop').style.display='none'; }
+function updateCartCount(){ const cart=getCart(); $('cartCount').innerText=Object.values(cart).reduce((s,n)=>s+n,0); }
+function renderCart(){ const list=$('cartList'); list.innerHTML=''; const cart=getCart(); const ids=Object.keys(cart); if(ids.length===0){list.innerHTML='<div class="muted">Cart empty</div>'; $('cartSummary').innerText="0 items";return;} let total=0,items=0; ids.forEach(id=>{ const p=sampleProducts.find(x=>x.id==id); const q=cart[id]; items+=q; total+=q*p.price; const node=document.createElement('div'); node.className='cart-item'; node.innerHTML=`<div style="flex:1"><b>${p.title}</b><div class="muted">₹${p.price} each</div></div><div class="qty"><button class="nav-btn" onclick="changeQty(${p.id},-1)">-</button><div class="pill">${q}</div><button class="nav-btn" onclick="changeQty(${p.id},1)">+</button></div><div><b>₹${q*p.price}</b></div><button class="nav-btn" onclick="removeItem(${p.id})">Remove</button>`; list.appendChild(node); }); $('cartSummary').innerText=`${items} items • Total ₹${total}`; }
+function changeQty(id,delta){ const cart=getCart(); if(!cart[id]) return; cart[id]+=delta; if(cart[id]<=0) delete cart[id]; saveCart(cart); renderCart(); updateCartCount(); }
+function removeItem(id){ const cart=getCart(); delete cart[id]; saveCart(cart); renderCart(); updateCartCount(); }
+
+// --- Navigation ---
+$('homeBtn').onclick=()=>{ $('homeSection').style.display='block'; $('cartSection').style.display='none'; $('contactSection').style.display='none'; }
+$('cartBtn').onclick=()=>{ $('homeSection').style.display='none'; $('cartSection').style.display='block'; $('contactSection').style.display='none'; renderCart(); }
+$('contactBtn').onclick=()=>{ $('homeSection').style.display='none'; $('cartSection').style.display='none'; $('contactSection').style.display='block'; }
+
+// --- Auth Modal ---
+$('loginBtn').onclick=()=>{ $('authBackdrop').style.display='flex'; showLogin(); }
+$('closeAuth').onclick=()=>{ $('authBackdrop').style.display='none'; }
+$('showRegister').onclick=showRegister;
+$('showLogin').onclick=showLogin;
+function showRegister(){ $('loginForm').style.display='none'; $('regForm').style.display='block'; $('authTitle').innerText='Register'; $('authMsg').innerText=''; }
+function showLogin(){ $('regForm').style.display='none'; $('loginForm').style.display='block'; $('authTitle').innerText='Login'; $('authMsg').innerText=''; }
+
+// --- Register/Login ---
+$('doRegister').onclick=()=>{
+  const name=$('regName').value.trim(), email=$('regEmail').value.trim(), pass=$('regPass').value;
+  if(!name||!email||!pass){$('authMsg').innerText="Fill all fields";return;}
+  const users=getUsers();
+  if(users.find(u=>u.email===email)){ $('authMsg').innerText="Email already registered"; return;}
+  users.push({id:Date.now(),name,email,pass}); saveUsers(users);
+  $('authMsg').innerText="Registered! Please login."; showLogin();
+}
+$('doLogin').onclick=()=>{
+  const email=$('loginEmail').value.trim(), pass=$('loginPass').value;
+  const users=getUsers();
+  const u=users.find(x=>x.email===email && x.pass===pass);
+  if(!u){ $('authMsg').innerText="Invalid credentials"; return; }
+  localStorage.setItem('q_session', JSON.stringify({id:u.id,name:u.name,email:u.email}));
+  $('authMsg').innerText="Logged in as "+u.name;
+  $('authBackdrop').style.display='none';
+  $('loginBtn').innerText="Hi, "+u.name;
+}
+
+// --- Admin Button ---
+function openAdmin(){
+  const pass = prompt("Enter admin password:");
+  if(pass==='61146'){ window.location.href='admin.html'; } 
+  else alert("Wrong password");
+}
+
+// --- Contact Form ---
+function sendMessage(){
+  const name=$('contactName').value.trim(), email=$('contactEmail').value.trim(), msg=$('contactMsg').value.trim();
+  if(!name||!email||!msg){alert("Fill all fields"); return;}
+  fetch('http://localhost:3000/contact',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({name,email,message:msg})
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    if(data.success){alert("Message sent to your email!");}
+    else{alert("Error: "+data.error);}
+    $('contactName').value=''; $('contactEmail').value=''; $('contactMsg').value='';
+  })
+  .catch(err=>alert("Error: "+err));
+}
+
+// --- Dark/Light Mode ---
+$('themeToggle').onclick=()=>{
+  document.body.classList.toggle('light');
+}
+
+$('productSearch').addEventListener('input', renderProducts);
+$('sortSelect').addEventListener('change', renderProducts);
+
+renderProducts();
+window.quickView=quickView; window.addToCart=addToCart; window.changeQty=changeQty; window.removeItem=removeItem;
+window.toggleWishlist=toggleWishlist; window.rateProduct=rateProduct;
+</script>
+</body>
+</html>
+
